@@ -1,0 +1,20 @@
+FROM jupyter/scipy-notebook
+
+ARG KG_VER
+RUN pip install "jupyter_kernel_gateway==$KG_VER"
+
+ARG BOKEH_VER
+RUN pip install "bokeh==$BOKEH_VER"
+
+ARG IPYWIDGETS_VER
+RUN pip install "ipywidgets==$IPYWIDGETS_VER"
+
+RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
+
+RUN pip install wordcloud && \
+    pip install BeautifulSoup4
+
+ADD api/ /srv/api
+
+# A shortcut to be able to use env variable KG_PORT in CMD
+CMD jupyter kernelgateway --KernelGatewayApp.ip=0.0.0.0 --KernelGatewayApp.port=$KG_PORT --KernelGatewayApp.log_level=DEBUG

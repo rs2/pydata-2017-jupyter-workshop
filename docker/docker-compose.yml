@@ -1,0 +1,72 @@
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+---
+version: "2"
+
+services:
+  docker_nb:
+    build:
+      context: .
+      dockerfile: Dockerfile.nb
+      args:
+        IPYWIDGETS_VER: "5.2.*"
+        DASHBOARDS_VER: "0.6.*"
+        CMS_VER: "0.6.*"
+        BUNDLER_VER: "0.8.*"
+    ports:
+      - "3010:3010"
+    depends_on:
+      - docker_db
+    links:
+      - docker_db
+    env_file: nb_secrets.env
+    environment:
+      DASHBOARD_SERVER_URL: http://docker_db:3000/
+      KG_URL: http://docker_kg:3020
+    restart: always
+    container_name: rs2-docker-nb
+    volumes:
+      - /data:/data
+
+  docker_db:
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+      args:
+          DB_VER: ">=0.8.0"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - docker_kg
+    links:
+      - docker_kg
+    env_file: db_secrets.env
+    environment:
+      PORT: 3000
+      KERNEL_GATEWAY_URL: http://docker_kg:3020
+      PUBLIC_LINK_PATTERN: http://localhost:3000
+    restart: always
+    container_name: rs2-docker-db
+    volumes:
+    - /data/dashboards:/srv/app/data
+
+  docker_kg:
+    build:
+      context: .
+      dockerfile: Dockerfile.kg
+      args:
+        IPYWIDGETS_VER: "5.2.*"
+        KG_VER: "1.0.*"
+        BOKEH_VER: "0.12.*"
+    ports:
+     - "3020:3020"
+    environment:
+      KG_ALLOW_ORIGIN: "*"
+      KG_LIST_KERNELS: "True"
+      KG_PORT: "3020"
+    restart: always
+    container_name: rs2-docker-kg
+    volumes:
+      - /data/home:/home
+      - /data:/data
