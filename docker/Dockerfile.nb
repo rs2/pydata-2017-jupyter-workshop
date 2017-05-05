@@ -47,14 +47,14 @@ RUN pip install "jupyter_dashboards_bundlers==$BUNDLER_VER" && \
 	jupyter dashboards_bundlers quick-setup --sys-prefix
 RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 
-ADD notebooks/ /home/jovyan/work/pyconuk-2016-workshop/
+ADD notebooks/ /home/jovyan/work
 USER root
 RUN chown -R jovyan /home/jovyan/work
 USER jovyan
 
 # Stay as jovyan in the newer docker stack images
 
-CMD ["jupyter", "notebook", "--port=3010", "--ip=0.0.0.0", "--no-browser", "--notebook-dir=/data/notebooks", \
+CMD ["jupyter", "notebook", "--port=3010", "--ip=0.0.0.0", "--no-browser", "--notebook-dir=/home/jovyan/work", \
     	"--NotebookApp.password=''", \
     	"--NotebookApp.token=''", \
         "--NotebookApp.session_manager_class=nb2kg.managers.SessionManager", \

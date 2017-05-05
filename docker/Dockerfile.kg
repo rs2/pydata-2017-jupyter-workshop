@@ -14,7 +14,5 @@ RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 RUN pip install wordcloud && \
     pip install BeautifulSoup4
 
-ADD api/ /srv/api
-
 # A shortcut to be able to use env variable KG_PORT in CMD
 CMD jupyter kernelgateway --KernelGatewayApp.ip=0.0.0.0 --KernelGatewayApp.port=$KG_PORT --KernelGatewayApp.log_level=DEBUG
